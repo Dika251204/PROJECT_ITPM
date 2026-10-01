@@ -1,0 +1,9 @@
+# 08-Implementasi-Pilihan-Jumlah-Cetakan/.htaccess
+
+# Izinkan CORS jika diakses dari frontend lain
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "POST, GET, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type"
+
+# Matikan opsi Directory Listing demi keamanan
+Options -Indexes

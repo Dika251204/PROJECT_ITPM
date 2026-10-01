@@ -1,0 +1,7 @@
+# 10-Implementasi-Perhitungan-Harga/.htaccess
+
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "POST, GET, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type"
+
+Options -Indexes
