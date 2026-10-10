@@ -42,7 +42,7 @@
             <a href="../10-Implementasi-Perhitungan-Harga/">Hitung Harga</a>
             <a href="../11-Implementasi-Pemesanan-Print-and-Jilid/">Pemesanan</a>
             <a href="../12-Implementasi-Manajemen-Pesanan-Print-and-Jilid/">Manajemen Pesanan</a>
-            <a href="../13-Implementasi-Status-Pesanan/">1Status Pesanan</a>
+            <a href="../13-Implementasi-Status-Pesanan/">Status Pesanan</a>
             <a href="../14-Implementasi-API-Print-and-Jilid/" class="active">API Print & Jilid</a>
         </nav>
 
