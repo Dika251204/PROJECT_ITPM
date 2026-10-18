@@ -1,142 +1,507 @@
-<?php
-
-session_start();
-
-include "koneksi.php";
-
-if (!isset($_SESSION['id_user'])) {
-    header("Location: auth/login.php");
-    exit;
-}
-
-$id_user = $_SESSION['id_user'];
-
-if (!isset($_GET['id'])) {
-    header("Location: index.php");
-    exit;
-}
-
-$id_pesanan = $_GET['id'];
-
-$query = mysqli_query($conn, "
-    select
-        pesanan.id_pesanan,
-        pesanan.total_harga,
-        pesanan.status
-    from pesanan
-    where pesanan.id_pesanan = '$id_pesanan'
-    and pesanan.id_user = '$id_user'
-");
-
-$pesanan = mysqli_fetch_assoc($query);
-
-if (!$pesanan) {
-    die("pesanan tidak ditemukan");
-}
-
-?>
+%%html
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
 
-    <title>pembayaran - uinma merch printhub</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Pembayaran - CampusMart</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f1f5f9;
+            color: #111827;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .navbar {
+            background: white;
+
+            padding: 18px 8%;
+
+            box-shadow:
+                0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .nav-content {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+
+            font-size: 24px;
+
+            font-weight: bold;
+
+            color: #2563eb;
+        }
+
+        .logo span {
+            color: #111827;
+        }
+
+        nav {
+            display: flex;
+
+            gap: 25px;
+        }
+
+        nav a {
+            text-decoration: none;
+
+            color: #374151;
+
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: #2563eb;
+        }
+
+
+        /* =========================
+           SECTION
+        ========================= */
+
+        .section {
+            min-height: 75vh;
+
+            padding: 50px 20px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: flex-start;
+        }
+
+
+        /* =========================
+           PAYMENT CARD
+        ========================= */
+
+        .payment-card {
+            width: 100%;
+
+            max-width: 500px;
+
+            background: white;
+
+            padding: 35px;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .payment-card h1 {
+            font-size: 28px;
+
+            margin-bottom: 8px;
+
+            text-align: center;
+        }
+
+        .order-number {
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 14px;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =========================
+           TOTAL
+        ========================= */
+
+        .payment-total {
+            background: #eff6ff;
+
+            border: 1px solid #dbeafe;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            margin-bottom: 25px;
+
+            color: #475569;
+
+            font-size: 14px;
+        }
+
+        .payment-total strong {
+            display: block;
+
+            margin-top: 8px;
+
+            font-size: 25px;
+
+            color: #2563eb;
+        }
+
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            color: #374151;
+        }
+
+        .form-group select {
+            width: 100%;
+
+            padding: 13px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 9px;
+
+            background: white;
+
+            font-size: 14px;
+
+            outline: none;
+
+            cursor: pointer;
+        }
+
+        .form-group select:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px rgba(37,99,235,0.10);
+        }
+
+
+        /* =========================
+           BUTTON
+        ========================= */
+
+        .btn-primary {
+            width: 100%;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+
+        /* =========================
+           SUCCESS
+        ========================= */
+
+        .success-message {
+            display: none;
+
+            margin-top: 20px;
+
+            padding: 15px;
+
+            border-radius: 9px;
+
+            background: #dcfce7;
+
+            color: #15803d;
+
+            font-size: 14px;
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            background: #111827;
+
+            color: white;
+
+            text-align: center;
+
+            padding: 25px;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .nav-content {
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            nav {
+                gap: 15px;
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+            }
+
+            .payment-card {
+                padding: 25px 20px;
+            }
+
+        }
+
+    </style>
 
 </head>
 
+
 <body>
 
-<nav>
 
-    <a href="index.php">home</a> |
-    <a href="produk.php">produk</a> |
-    <a href="keranjang.php">keranjang</a> |
-    <a href="auth/logout.php">logout</a>
+<!-- =========================
+     NAVBAR
+========================= -->
 
-</nav>
+<header class="navbar">
 
-<hr>
+    <div class="nav-content">
 
-<h1>pembayaran</h1>
+        <a href="#" class="logo">
+            Campus<span>Mart</span>
+        </a>
 
-<p>
-    nomor pesanan:
-    <?php echo $pesanan['id_pesanan']; ?>
-</p>
+        <nav>
 
-<p>
-    total pembayaran:
-    rp <?php echo number_format($pesanan['total_harga'], 0, ',', '.'); ?>
-</p>
+            <a href="#">
+                Home
+            </a>
 
-<p>
-    status pesanan:
-    <?php echo $pesanan['status']; ?>
-</p>
+            <a href="#">
+                Merchandise
+            </a>
 
-<hr>
+            <a href="#">
+                Tracking
+            </a>
 
-<h2>pilih metode pembayaran</h2>
+            <a href="#">
+                Profile
+            </a>
 
-<form action="proses_pembayaran.php" method="post" enctype="multipart/form-data">
+        </nav>
 
-    <input
-        type="hidden"
-        name="id_pesanan"
-        value="<?php echo $pesanan['id_pesanan']; ?>"
-    >
+    </div>
 
-    <label>metode pembayaran</label>
+</header>
 
-    <br>
 
-    <select name="metode_pembayaran" required>
+<!-- =========================
+     PEMBAYARAN
+========================= -->
 
-        <option value="">
-            -- pilih pembayaran --
-        </option>
+<section class="section">
 
-        <option value="transfer bank">
-            transfer bank
-        </option>
+    <div class="payment-card">
 
-        <option value="qris">
-            qris
-        </option>
+        <h1>
+            Pembayaran
+        </h1>
 
-        <option value="cash">
-            cash
-        </option>
+        <p class="order-number">
+            Pesanan #CM001
+        </p>
 
-    </select>
 
-    <br><br>
+        <!-- TOTAL PEMBAYARAN -->
 
-    <label>bukti pembayaran</label>
+        <div class="payment-total">
 
-    <br>
+            Total Pembayaran
 
-    <input
-        type="file"
-        name="bukti_pembayaran"
-        accept="image/*"
-        required
-    >
+            <strong>
+                Rp 345.000
+            </strong>
 
-    <br><br>
+        </div>
 
-    <button type="submit">
-        kirim pembayaran
-    </button>
 
-</form>
+        <!-- FORM PEMBAYARAN -->
 
-<br>
+        <form id="paymentForm">
 
-<a href="pesanan.php?id=<?php echo $id_pesanan; ?>">
-    kembali ke pesanan
-</a>
+
+            <div class="form-group">
+
+                <label for="metode">
+                    Pilih Metode Pembayaran
+                </label>
+
+                <select
+                    id="metode"
+                    required>
+
+                    <option value="">
+                        -- Pilih Pembayaran --
+                    </option>
+
+                    <option value="Transfer Bank">
+                        Transfer Bank
+                    </option>
+
+                    <option value="QRIS">
+                        QRIS
+                    </option>
+
+                    <option value="E-Wallet">
+                        E-Wallet
+                    </option>
+
+                    <option value="COD">
+                        COD
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="btn-primary">
+
+                Konfirmasi Pembayaran
+
+            </button>
+
+
+        </form>
+
+
+        <!-- PESAN BERHASIL -->
+
+        <div
+            id="successMessage"
+            class="success-message">
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+    © 2026 CampusMart
+
+</footer>
+
+
+<script>
+
+    document.getElementById("paymentForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+
+            let metode =
+                document.getElementById("metode").value;
+
+
+            let success =
+                document.getElementById("successMessage");
+
+
+            if (metode === "") {
+
+                alert(
+                    "Silakan pilih metode pembayaran."
+                );
+
+                return;
+
+            }
+
+
+            success.innerHTML =
+                "Pembayaran berhasil dikonfirmasi menggunakan <b>"
+                + metode +
+                "</b>.";
+
+
+            success.style.display = "block";
+
+
+            document.getElementById("paymentForm")
+                .reset();
+
+        });
+
+</script>
+
 
 </body>
 
